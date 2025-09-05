@@ -72,4 +72,61 @@ window.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    if (collected.length < targetWord.le
+    if (collected.length < targetWord.length) {
+      requestAnimationFrame(gameLoop);
+    }
+  }
+
+  function endGame() {
+    clearInterval(spawnInterval);
+    gameScreen.classList.add("hidden");
+    endScreen.classList.remove("hidden");
+  }
+
+  // Desktop controls
+  window.addEventListener("keydown", e => {
+    if (e.key === "ArrowLeft") catcherX -= 20;
+    if (e.key === "ArrowRight") catcherX += 20;
+    if (catcherX < 0) catcherX = 0;
+    if (catcherX > window.innerWidth - 120) catcherX = window.innerWidth - 120;
+    catcher.style.left = catcherX + "px";
+  });
+
+  // Mobile touch controls
+  let touchStartX = null;
+  window.addEventListener("touchstart", e => {
+    touchStartX = e.touches[0].clientX;
+  });
+  window.addEventListener("touchmove", e => {
+    if (touchStartX !== null) {
+      let touchX = e.touches[0].clientX;
+      let deltaX = touchX - touchStartX;
+      catcherX += deltaX;
+      if (catcherX < 0) catcherX = 0;
+      if (catcherX > window.innerWidth - 120) catcherX = window.innerWidth - 120;
+      catcher.style.left = catcherX + "px";
+      touchStartX = touchX;
+    }
+  });
+  window.addEventListener("touchend", () => {
+    touchStartX = null;
+  });
+
+  // Start button
+  startBtn.addEventListener("click", () => {
+    startScreen.classList.add("hidden");
+    gameScreen.classList.remove("hidden");
+    resetGame();
+    spawnInterval = setInterval(spawnLetter, 1500);
+    gameLoop();
+  });
+
+  // Restart button
+  restartBtn.addEventListener("click", () => {
+    endScreen.classList.add("hidden");
+    gameScreen.classList.remove("hidden");
+    resetGame();
+    spawnInterval = setInterval(spawnLetter, 1500);
+    gameLoop();
+  });
+});
