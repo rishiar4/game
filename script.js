@@ -1,137 +1,134 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
 
-const startScreen = document.getElementById("start-screen");
-const endScreen = document.getElementById("end-screen");
-const startBtn = document.getElementById("start-btn");
-const restartBtn = document.getElementById("restart-btn");
-const bgMusic = document.getElementById("bg-music");
-const video = document.getElementById("birthdayVideo");
+const startScreen = document.getElementById("startScreen");
+const gameOverScreen = document.getElementById("gameOverScreen");
+const winScreen = document.getElementById("winScreen");
+const startBtn = document.getElementById("startBtn");
+const restartBtn = document.getElementById("restartBtn");
 
-let basket, letters, score, gameOver, animationId, letterInterval;
+let basket = { x: canvas.width / 2 - 40, y: canvas.height - 40, width: 80, height: 20 };
+let letters = [];
+let caughtLetters = [];
+let gameRunning = false;
+let gameLoopId;
+let letterInterval;
 
-const basketImg = new Image();
-basketImg.src = "assets/cake.png";
+const word = "SHREYA".split(""); // The target word
 
-// Reset game state
+// 🎮 Start Game
+startBtn.addEventListener("click", () => {
+  startScreen.style.display = "none";
+  winScreen.style.display = "none";
+  gameOverScreen.style.display = "none";
+  resetGame();
+  startGame();
+});
+
+// 🔁 Restart Game
+restartBtn.addEventListener("click", () => {
+  gameOverScreen.style.display = "none";
+  winScreen.style.display = "none";
+  resetGame();
+  startGame();
+});
+
 function resetGame() {
-  basket = {
-    x: canvas.width / 2 - 40,
-    y: canvas.height - 100,
-    width: 80,
-    height: 80
-  };
   letters = [];
-  score = 0;
-  gameOver = false;
+  caughtLetters = [];
+  gameRunning = true;
+  clearInterval(letterInterval);
+  if (gameLoopId) cancelAnimationFrame(gameLoopId);
 }
 
-// Draw basket
-function drawBasket() {
-  ctx.drawImage(basketImg, basket.x, basket.y, basket.width, basket.height);
+function startGame() {
+  letterInterval = setInterval(spawnLetter, 1500);
+  gameLoop();
 }
 
-// Draw letters and move them
-function drawLetters() {
-  ctx.fillStyle = "blue";
-  ctx.font = "40px Arial";
-  letters.forEach(letter => {
-    ctx.fillText("S", letter.x, letter.y);
-    letter.y += letter.speed; // falling
-  });
+// 🎲 Spawn a random letter from SHREYA
+function spawnLetter() {
+  const size = 40;
+  const x = Math.random() * (canvas.width - size);
+  const letter = word[Math.floor(Math.random() * word.length)];
+  letters.push({ x, y: -size, size, speed: 2 + Math.random() * 3, char: letter });
 }
 
-// Check collisions
-function checkCollision() {
-  letters = letters.filter(letter => {
-    if (
-      letter.y > basket.y &&
-      letter.x < basket.x + basket.width &&
-      letter.x + 20 > basket.x // approx width of "S"
-    ) {
-      score++;
-      if (score >= 10) {
-        endGame();
-      }
-      return false; // caught
-    }
-    return letter.y < canvas.height; // keep if still on screen
-  });
-}
-
-// Game loop
+// 🎮 Main Game Loop
 function gameLoop() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawBasket();
-  drawLetters();
-  checkCollision();
+  if (!gameRunning) return;
 
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Draw basket
+  ctx.fillStyle = "blue";
+  ctx.fillRect(basket.x, basket.y, basket.width, basket.height);
+
+  // Draw falling letters
+  drawLetters();
+
+  // Draw caught letters progress
   ctx.fillStyle = "black";
   ctx.font = "24px Arial";
-  ctx.fillText("Score: " + score, 20, 40);
+  ctx.fillText("Caught: " + caughtLetters.join(" "), 10, 30);
 
-  if (!gameOver) {
-    animationId = requestAnimationFrame(gameLoop);
+  // Check Win
+  if (caughtLetters.length === word.length && caughtLetters.sort().join("") === word.sort().join("")) {
+    endGame(true);
+    return;
+  }
+
+  gameLoopId = requestAnimationFrame(gameLoop);
+}
+
+// ✨ Draw and update letters
+function drawLetters() {
+  for (let i = 0; i < letters.length; i++) {
+    const l = letters[i];
+    l.y += l.speed;
+
+    ctx.fillStyle = "red";
+    ctx.font = `${l.size}px Arial`;
+    ctx.fillText(l.char, l.x, l.y);
+
+    // Collision detection
+    if (
+      l.y + l.size > basket.y &&
+      l.x > basket.x &&
+      l.x < basket.x + basket.width
+    ) {
+      if (!caughtLetters.includes(l.char)) {
+        caughtLetters.push(l.char);
+      }
+      letters.splice(i, 1);
+      i--;
+    }
+
+    // If missed
+    if (l.y > canvas.height) {
+      letters.splice(i, 1);
+      i--;
+    }
   }
 }
 
-// Spawn a new “S”
-function spawnLetter() {
-  const x = Math.random() * (canvas.width - 20);
-  letters.push({ x, y: -20, speed: 2 + Math.random() * 3 });
-}
-
-// End game
-function endGame() {
-  gameOver = true;
-  cancelAnimationFrame(animationId);
+// 🏁 End Game
+function endGame(win) {
+  gameRunning = false;
   clearInterval(letterInterval);
-  bgMusic.pause();
+  cancelAnimationFrame(gameLoopId);
 
-  canvas.style.display = "none";
-  endScreen.classList.remove("hidden");
-
-  document.querySelector("#end-screen h1").innerText =
-    `🎂 Happy Birthday [HER_NAME] 💕 🎂\nYou caught ${score}/10 🎈`;
-
-  video.play();
+  if (win) {
+    winScreen.style.display = "flex";
+    winScreen.innerHTML = "<h1>🎉 Happy Birthday Shreya! 🎉</h1>";
+  } else {
+    gameOverScreen.style.display = "flex";
+  }
 }
 
-// Start button
-startBtn.addEventListener("click", () => {
-  startScreen.classList.add("hidden");
-  canvas.style.display = "block";
-  endScreen.classList.add("hidden");
-
-  resetGame();
-  bgMusic.play();
-  gameLoop();
-
-  spawnLetter();
-  letterInterval = setInterval(spawnLetter, 1500);
-});
-
-// Restart button
-restartBtn.addEventListener("click", () => {
-  endScreen.classList.add("hidden");
-  canvas.style.display = "block";
-  startScreen.classList.add("hidden");
-
-  resetGame();
-  bgMusic.play();
-  gameLoop();
-
-  spawnLetter();
-  letterInterval = setInterval(spawnLetter, 1500);
-});
-
-// Mobile tilt control
-window.addEventListener("deviceorientation", (e) => {
-  if (e.gamma) {
-    basket.x += e.gamma;
-    if (basket.x < 0) basket.x = 0;
-    if (basket.x + basket.width > canvas.width) basket.x = canvas.width - basket.width;
-  }
+// 🎮 Move basket
+document.addEventListener("keydown", (e) => {
+  if (!gameRunning) return;
+  if (e.key === "ArrowLeft" && basket.x > 0) basket.x -= 20;
+  if (e.key === "ArrowRight" && basket.x + basket.width < canvas.width) basket.x += 20;
 });
