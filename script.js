@@ -6,6 +6,9 @@ const gameOverScreen = document.getElementById("gameOverScreen");
 const winScreen = document.getElementById("winScreen");
 const startBtn = document.getElementById("startBtn");
 const restartBtn = document.getElementById("restartBtn");
+const controls = document.getElementById("controls");
+const leftBtn = document.getElementById("leftBtn");
+const rightBtn = document.getElementById("rightBtn");
 
 let basket = { x: canvas.width / 2 - 40, y: canvas.height - 40, width: 80, height: 20 };
 let letters = [];
@@ -22,6 +25,7 @@ startBtn.addEventListener("click", () => {
   winScreen.style.display = "none";
   gameOverScreen.style.display = "none";
   canvas.style.display = "block";
+  controls.style.display = "flex";
   resetGame();
   startGame();
 });
@@ -30,6 +34,8 @@ startBtn.addEventListener("click", () => {
 restartBtn.addEventListener("click", () => {
   gameOverScreen.style.display = "none";
   winScreen.style.display = "none";
+  canvas.style.display = "block";
+  controls.style.display = "flex";
   resetGame();
   startGame();
 });
@@ -120,6 +126,7 @@ function endGame(win) {
   cancelAnimationFrame(gameLoopId);
 
   canvas.style.display = "none";
+  controls.style.display = "none";
 
   if (win) {
     winScreen.style.display = "flex";
@@ -129,9 +136,18 @@ function endGame(win) {
   }
 }
 
-// 🎮 Move basket
+// 🎮 Move basket with keyboard
 document.addEventListener("keydown", (e) => {
   if (!gameRunning) return;
   if (e.key === "ArrowLeft" && basket.x > 0) basket.x -= 20;
   if (e.key === "ArrowRight" && basket.x + basket.width < canvas.width) basket.x += 20;
+});
+
+// 🎮 Move basket with on-screen buttons
+leftBtn.addEventListener("click", () => {
+  if (basket.x > 0) basket.x -= 30;
+});
+
+rightBtn.addEventListener("click", () => {
+  if (basket.x + basket.width < canvas.width) basket.x += 30;
 });

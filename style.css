@@ -7,6 +7,7 @@ body {
   justify-content: center;
   align-items: center;
   height: 100vh;
+  flex-direction: column;
   overflow: hidden;
 }
 
@@ -50,4 +51,25 @@ button:hover {
 #winScreen h1 {
   font-size: 36px;
   color: #4caf50;
+}
+
+#controls {
+  display: none;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+#controls button {
+  font-size: 24px;
+  padding: 15px 25px;
+  margin: 0 10px;
+  border: none;
+  background: #4caf50;
+  color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+#controls button:hover {
+  background: #388e3c;
 }
