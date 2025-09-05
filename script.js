@@ -100,17 +100,22 @@ function endGame() {
   clearInterval(balloonInterval);
   bgMusic.pause();
 
-  // Show end screen with score
+  // Hide canvas, show end screen
+  canvas.style.display = "none";
+  endScreen.classList.remove("hidden");
+
   document.querySelector("#end-screen h1").innerText =
     `🎂 Happy Birthday [HER_NAME] 💕 🎂\nYou caught ${score}/10 🎈`;
-  
-  endScreen.classList.remove("hidden");
+
   video.play();
 }
 
 // Start button
 startBtn.addEventListener("click", () => {
   startScreen.classList.add("hidden");
+  canvas.style.display = "block";
+  endScreen.classList.add("hidden");
+
   resetGame();
   bgMusic.play();
   gameLoop();
@@ -125,6 +130,9 @@ startBtn.addEventListener("click", () => {
 // Restart button
 restartBtn.addEventListener("click", () => {
   endScreen.classList.add("hidden");
+  canvas.style.display = "block";
+  startScreen.classList.add("hidden");
+
   resetGame();
   bgMusic.play();
   gameLoop();
