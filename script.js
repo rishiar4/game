@@ -11,11 +11,16 @@ const bgMusic = document.getElementById("bg-music");
 
 let basket, letters, score, gameOver, animationId, spawnInterval;
 
-// Target word
+// Word to collect
 const targetWord = "SHREYA".split("");
 
 function resetGame() {
-  basket = { x: canvas.width / 2 - 50, y: canvas.height - 60, width: 100, height: 20 };
+  basket = {
+    x: canvas.width / 2 - 50,
+    y: canvas.height - 60,
+    width: 100,
+    height: 20,
+  };
   letters = [];
   score = 0;
   gameOver = false;
@@ -30,14 +35,14 @@ function drawBasket() {
 function drawLetters() {
   ctx.fillStyle = "red";
   ctx.font = "40px Arial";
-  letters.forEach(letter => {
+  letters.forEach((letter) => {
     ctx.fillText(letter.char, letter.x, letter.y);
     letter.y += letter.speed;
   });
 }
 
 function checkCollision() {
-  letters = letters.filter(letter => {
+  letters = letters.filter((letter) => {
     if (
       letter.y + 40 > basket.y &&
       letter.x > basket.x &&
@@ -47,9 +52,9 @@ function checkCollision() {
       if (score >= targetWord.length) {
         endGame();
       }
-      return false; // caught
+      return false; // remove caught letter
     }
-    return letter.y < canvas.height;
+    return letter.y < canvas.height; // remove if it goes out of screen
   });
 }
 
@@ -59,16 +64,16 @@ function gameLoop() {
   drawLetters();
   checkCollision();
 
-  // Draw score
+  // Score counter
   ctx.fillStyle = "black";
   ctx.font = "24px Arial";
-  ctx.fillText("Score: " + score, 20, 40);
+  ctx.fillText("Caught: " + score + "/" + targetWord.length, 20, 40);
 
   if (!gameOver) animationId = requestAnimationFrame(gameLoop);
 }
 
 function spawnLetter() {
-  const char = targetWord[letters.length % targetWord.length];
+  const char = targetWord[Math.floor(Math.random() * targetWord.length)];
   const x = Math.random() * (canvas.width - 40);
   letters.push({ char, x, y: -40, speed: 2 + Math.random() * 2 });
 }
@@ -78,7 +83,7 @@ function endGame() {
   cancelAnimationFrame(animationId);
   clearInterval(spawnInterval);
   endScreen.classList.remove("hidden");
-  bgMusic.pause(); // remove this line if you want music to keep playing
+  bgMusic.pause();
 }
 
 startBtn.addEventListener("click", () => {
@@ -86,7 +91,7 @@ startBtn.addEventListener("click", () => {
   resetGame();
   bgMusic.play();
   gameLoop();
-  spawnInterval = setInterval(spawnLetter, 1500);
+  spawnInterval = setInterval(spawnLetter, 1500); // keep letters falling
 });
 
 restartBtn.addEventListener("click", () => {
@@ -97,16 +102,17 @@ restartBtn.addEventListener("click", () => {
   spawnInterval = setInterval(spawnLetter, 1500);
 });
 
-// Basket control (tilt phone)
+// Basket controls: phone tilt
 window.addEventListener("deviceorientation", (e) => {
   if (e.gamma) {
     basket.x += e.gamma;
     if (basket.x < 0) basket.x = 0;
-    if (basket.x + basket.width > canvas.width) basket.x = canvas.width - basket.width;
+    if (basket.x + basket.width > canvas.width)
+      basket.x = canvas.width - basket.width;
   }
 });
 
-// Basket control (keyboard for PC testing)
+// Basket controls: keyboard (for PC testing)
 window.addEventListener("keydown", (e) => {
   if (e.key === "ArrowLeft") basket.x -= 20;
   if (e.key === "ArrowRight") basket.x += 20;
