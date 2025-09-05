@@ -10,13 +10,10 @@ const restartBtn = document.getElementById("restart-btn");
 const bgMusic = document.getElementById("bg-music");
 const video = document.getElementById("birthdayVideo");
 
-let basket, balloons, score, gameOver, animationId, balloonInterval;
+let basket, letters, score, gameOver, animationId, letterInterval;
 
 const basketImg = new Image();
 basketImg.src = "assets/cake.png";
-
-const balloonImg = new Image();
-balloonImg.src = "assets/balloons.jpg";
 
 // Reset game state
 function resetGame() {
@@ -26,7 +23,7 @@ function resetGame() {
     width: 80,
     height: 80
   };
-  balloons = [];
+  letters = [];
   score = 0;
   gameOver = false;
 }
@@ -36,45 +33,39 @@ function drawBasket() {
   ctx.drawImage(basketImg, basket.x, basket.y, basket.width, basket.height);
 }
 
-// Draw balloons + move them
-function drawBalloons() {
-  balloons.forEach(balloon => {
-    if (balloonImg.complete) {
-      ctx.drawImage(balloonImg, balloon.x, balloon.y, balloon.size, balloon.size);
-    } else {
-      // fallback debug circle
-      ctx.fillStyle = "red";
-      ctx.beginPath();
-      ctx.arc(balloon.x + balloon.size/2, balloon.y + balloon.size/2, balloon.size/2, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    balloon.y += balloon.speed;
+// Draw letters and move them
+function drawLetters() {
+  ctx.fillStyle = "blue";
+  ctx.font = "40px Arial";
+  letters.forEach(letter => {
+    ctx.fillText("S", letter.x, letter.y);
+    letter.y += letter.speed; // falling
   });
 }
 
-// Check collision with basket
+// Check collisions
 function checkCollision() {
-  balloons = balloons.filter(balloon => {
+  letters = letters.filter(letter => {
     if (
-      balloon.y + balloon.size > basket.y &&
-      balloon.x < basket.x + basket.width &&
-      balloon.x + balloon.size > basket.x
+      letter.y > basket.y &&
+      letter.x < basket.x + basket.width &&
+      letter.x + 20 > basket.x // approx width of "S"
     ) {
       score++;
       if (score >= 10) {
         endGame();
       }
-      return false; // caught → remove
+      return false; // caught
     }
-    return balloon.y < canvas.height; // keep only if still on screen
+    return letter.y < canvas.height; // keep if still on screen
   });
 }
 
-// Main game loop
+// Game loop
 function gameLoop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawBasket();
-  drawBalloons();
+  drawLetters();
   checkCollision();
 
   ctx.fillStyle = "black";
@@ -86,18 +77,17 @@ function gameLoop() {
   }
 }
 
-// Spawn a balloon
-function spawnBalloon() {
-  const size = 50;
-  const x = Math.random() * (canvas.width - size);
-  balloons.push({ x, y: -size, size, speed: 2 + Math.random() * 3 });
+// Spawn a new “S”
+function spawnLetter() {
+  const x = Math.random() * (canvas.width - 20);
+  letters.push({ x, y: -20, speed: 2 + Math.random() * 3 });
 }
 
-// End the game
+// End game
 function endGame() {
   gameOver = true;
   cancelAnimationFrame(animationId);
-  clearInterval(balloonInterval);
+  clearInterval(letterInterval);
   bgMusic.pause();
 
   canvas.style.display = "none";
@@ -119,8 +109,8 @@ startBtn.addEventListener("click", () => {
   bgMusic.play();
   gameLoop();
 
-  spawnBalloon(); // spawn first immediately
-  balloonInterval = setInterval(spawnBalloon, 1500);
+  spawnLetter();
+  letterInterval = setInterval(spawnLetter, 1500);
 });
 
 // Restart button
@@ -133,11 +123,11 @@ restartBtn.addEventListener("click", () => {
   bgMusic.play();
   gameLoop();
 
-  spawnBalloon();
-  balloonInterval = setInterval(spawnBalloon, 1500);
+  spawnLetter();
+  letterInterval = setInterval(spawnLetter, 1500);
 });
 
-// Tilt control (mobile)
+// Mobile tilt control
 window.addEventListener("deviceorientation", (e) => {
   if (e.gamma) {
     basket.x += e.gamma;

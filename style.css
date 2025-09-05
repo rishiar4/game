@@ -2,79 +2,52 @@ body {
   margin: 0;
   padding: 0;
   font-family: Arial, sans-serif;
-  background: #f0f8ff;
-  overflow: hidden;
+  background: #fdf6f9;
+  text-align: center;
 }
 
-/* Hide screens by default */
+/* Hide canvas + end screen initially */
 #gameCanvas,
 #end-screen {
   display: none;
 }
 
-/* Start screen visible initially */
-#start-screen {
+#start-screen,
+#end-screen {
+  height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  background: #fff8f0;
 }
 
-#start-screen h1 {
-  font-size: 2em;
+#start-screen h1,
+#end-screen h1 {
   margin-bottom: 20px;
 }
 
-#start-btn,
-#restart-btn {
+button {
   padding: 12px 24px;
   font-size: 18px;
+  cursor: pointer;
   border: none;
   border-radius: 8px;
   background: #ff69b4;
-  color: #fff;
-  cursor: pointer;
+  color: white;
   transition: background 0.3s;
 }
 
-#start-btn:hover,
-#restart-btn:hover {
-  background: #ff1493;
+button:hover {
+  background: #e0559e;
 }
 
-/* Game canvas fullscreen */
+.hidden {
+  display: none !important;
+}
+
 #gameCanvas {
   display: block;
   width: 100%;
   height: 100%;
-  background: #f0f8ff;
-}
-
-/* End screen styling */
-#end-screen {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background: #fff8f0;
-  text-align: center;
-}
-
-#end-screen h1 {
-  font-size: 1.8em;
-  margin-bottom: 20px;
-}
-
-#end-screen video {
-  max-width: 90%;
-  margin: 20px 0;
-  border-radius: 10px;
-}
-
-/* Utility class */
-.hidden {
-  display: none !important;
+  background: #e0f7ff;
 }
