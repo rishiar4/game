@@ -16,7 +16,7 @@ const basketImg = new Image();
 basketImg.src = "assets/cake.png";
 
 const balloonImg = new Image();
-balloonImg.src = "assets/balloon.png";
+balloonImg.src = "assets/balloons.jpg";
 
 function resetGame() {
   basket = { x: canvas.width / 2 - 40, y: canvas.height - 100, width: 80, height: 80 };
