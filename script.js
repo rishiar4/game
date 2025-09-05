@@ -80,8 +80,8 @@ window.addEventListener("DOMContentLoaded", () => {
   function endGame() {
     clearInterval(spawnInterval);
     gameScreen.classList.add("hidden");
+    gameBox.classList.add("hidden");
     endScreen.classList.remove("hidden");
-    gameBox.classList.add("hidden"); // hide box after game ends
   }
 
   function moveCatcher(delta) {
