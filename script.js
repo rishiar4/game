@@ -6,45 +6,45 @@ window.addEventListener("DOMContentLoaded", () => {
   const restartBtn = document.getElementById("restart-btn");
   const catcher = document.getElementById("catcher");
   const collectedDiv = document.getElementById("collected");
+  const gameBox = document.getElementById("game-box");
+  const leftBtn = document.getElementById("left-btn");
+  const rightBtn = document.getElementById("right-btn");
 
-  let catcherX = window.innerWidth / 2 - 60;
+  const boxWidth = 400;
+  const boxHeight = 600;
+  let catcherX = boxWidth / 2 - 60;
   let letters = [];
   let collected = [];
   let spawnInterval;
   const targetWord = "SHREYA".split("");
 
-  // Reset game
   function resetGame() {
     letters.forEach(l => l.el.remove());
     letters = [];
     collected = [];
-    catcherX = window.innerWidth / 2 - 60;
+    catcherX = boxWidth / 2 - 60;
     catcher.style.left = catcherX + "px";
     updateCollectedDisplay();
   }
 
-  // Update collected and remaining letters display
   function updateCollectedDisplay() {
     const remaining = targetWord.filter(l => !collected.includes(l));
     collectedDiv.textContent = "Collected: " + collected.join(" ") +
                                " | Remaining: " + remaining.join(" ");
   }
 
-  // Spawn falling letter
   function spawnLetter() {
     const letter = targetWord[Math.floor(Math.random() * targetWord.length)];
     const el = document.createElement("div");
     el.classList.add("letter");
     el.textContent = letter;
-    const x = Math.random() * (window.innerWidth - 30);
+    const x = Math.random() * (boxWidth - 30);
     el.style.left = x + "px";
     el.style.top = "0px";
-    gameScreen.appendChild(el);
-
-    letters.push({ el, x, y: 0, speed: 2 + Math.random() * 3, char: letter });
+    gameBox.appendChild(el);
+    letters.push({ el, x, y: 0, speed: 2 + Math.random() * 2, char: letter });
   }
 
-  // Game loop
   function gameLoop() {
     letters.forEach((l, i) => {
       l.y += l.speed;
@@ -52,7 +52,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
       // Collision
       if (
-        l.y + 30 >= window.innerHeight - 60 &&
+        l.y + 30 >= boxHeight - 60 &&
         l.x + 20 > catcherX &&
         l.x < catcherX + 120
       ) {
@@ -66,7 +66,7 @@ window.addEventListener("DOMContentLoaded", () => {
       }
 
       // Remove if falls below screen
-      if (l.y > window.innerHeight) {
+      if (l.y > boxHeight) {
         l.el.remove();
         letters.splice(i, 1);
       }
@@ -81,41 +81,50 @@ window.addEventListener("DOMContentLoaded", () => {
     clearInterval(spawnInterval);
     gameScreen.classList.add("hidden");
     endScreen.classList.remove("hidden");
+    gameBox.classList.add("hidden"); // hide box after game ends
   }
 
-  // Desktop controls
-  window.addEventListener("keydown", e => {
-    if (e.key === "ArrowLeft") catcherX -= 20;
-    if (e.key === "ArrowRight") catcherX += 20;
+  function moveCatcher(delta) {
+    catcherX += delta;
     if (catcherX < 0) catcherX = 0;
-    if (catcherX > window.innerWidth - 120) catcherX = window.innerWidth - 120;
+    if (catcherX > boxWidth - 120) catcherX = boxWidth - 120;
     catcher.style.left = catcherX + "px";
+  }
+
+  // Desktop arrow keys
+  window.addEventListener("keydown", e => {
+    if (e.key === "ArrowLeft") moveCatcher(-20);
+    if (e.key === "ArrowRight") moveCatcher(20);
   });
 
-  // Mobile touch controls
+  // Mobile touch drag
   let touchStartX = null;
-  window.addEventListener("touchstart", e => {
+  gameBox.addEventListener("touchstart", e => {
     touchStartX = e.touches[0].clientX;
   });
-  window.addEventListener("touchmove", e => {
+  gameBox.addEventListener("touchmove", e => {
     if (touchStartX !== null) {
-      let touchX = e.touches[0].clientX;
-      let deltaX = touchX - touchStartX;
-      catcherX += deltaX;
-      if (catcherX < 0) catcherX = 0;
-      if (catcherX > window.innerWidth - 120) catcherX = window.innerWidth - 120;
-      catcher.style.left = catcherX + "px";
+      const touchX = e.touches[0].clientX;
+      moveCatcher(touchX - touchStartX);
       touchStartX = touchX;
     }
   });
-  window.addEventListener("touchend", () => {
+  gameBox.addEventListener("touchend", () => {
     touchStartX = null;
   });
+
+  // On-screen buttons hold
+  let leftInterval, rightInterval;
+  leftBtn.addEventListener("touchstart", () => { leftInterval = setInterval(() => moveCatcher(-5), 50); });
+  leftBtn.addEventListener("touchend", () => clearInterval(leftInterval));
+  rightBtn.addEventListener("touchstart", () => { rightInterval = setInterval(() => moveCatcher(5), 50); });
+  rightBtn.addEventListener("touchend", () => clearInterval(rightInterval));
 
   // Start button
   startBtn.addEventListener("click", () => {
     startScreen.classList.add("hidden");
     gameScreen.classList.remove("hidden");
+    gameBox.classList.remove("hidden");
     resetGame();
     spawnInterval = setInterval(spawnLetter, 1500);
     gameLoop();
@@ -125,6 +134,7 @@ window.addEventListener("DOMContentLoaded", () => {
   restartBtn.addEventListener("click", () => {
     endScreen.classList.add("hidden");
     gameScreen.classList.remove("hidden");
+    gameBox.classList.remove("hidden");
     resetGame();
     spawnInterval = setInterval(spawnLetter, 1500);
     gameLoop();
