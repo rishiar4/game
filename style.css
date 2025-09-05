@@ -6,7 +6,7 @@ body, html {
   font-family: Arial, sans-serif;
   background: #fce4ec;
   overflow: hidden;
-  -webkit-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%; /* prevent Safari zoom */
 }
 
 /* Screens */
@@ -35,7 +35,7 @@ canvas {
 
 /* Buttons */
 button {
-  font-size: 18px; /* must be >=16px to prevent iOS zoom */
+  font-size: 18px;  /* >=16px to stop mobile zoom */
   padding: 12px 24px;
   border: none;
   border-radius: 8px;
@@ -51,10 +51,6 @@ button:active {
   transform: scale(0.95);
 }
 
-/* Video */
-#birthdayVideo {
-  width: 80%;
-  max-width: 500px;
-  margin: 20px auto;
-  border-radius: 10px;
+html {
+  touch-action: manipulation; /* prevent double-tap zoom */
 }

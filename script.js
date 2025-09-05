@@ -8,11 +8,10 @@ const endScreen = document.getElementById("end-screen");
 const startBtn = document.getElementById("start-btn");
 const restartBtn = document.getElementById("restart-btn");
 const bgMusic = document.getElementById("bg-music");
-const video = document.getElementById("birthdayVideo");
 
 let basket, letters, score, gameOver, animationId, spawnInterval;
 
-// Falling word "SHREYA"
+// Target word
 const targetWord = "SHREYA".split("");
 
 function resetGame() {
@@ -60,7 +59,7 @@ function gameLoop() {
   drawLetters();
   checkCollision();
 
-  // Draw Score
+  // Draw score
   ctx.fillStyle = "black";
   ctx.font = "24px Arial";
   ctx.fillText("Score: " + score, 20, 40);
@@ -79,8 +78,7 @@ function endGame() {
   cancelAnimationFrame(animationId);
   clearInterval(spawnInterval);
   endScreen.classList.remove("hidden");
-  bgMusic.pause();
-  video.play();
+  bgMusic.pause(); // remove this line if you want music to keep playing
 }
 
 startBtn.addEventListener("click", () => {
