@@ -17,7 +17,7 @@ let gameRunning = false;
 let gameLoopId;
 let letterInterval;
 
-const word = "SHREYA".split(""); // target letters
+const word = "SHREYA".split("");
 
 // 🎮 Start Game
 startBtn.addEventListener("click", () => {
@@ -53,7 +53,6 @@ function startGame() {
   gameLoop();
 }
 
-// 🎲 Spawn a random letter
 function spawnLetter() {
   const size = 40;
   const x = Math.random() * (canvas.width - size);
@@ -61,25 +60,24 @@ function spawnLetter() {
   letters.push({ x, y: -size, size, speed: 2 + Math.random() * 3, char: letter });
 }
 
-// 🎮 Game Loop
 function gameLoop() {
   if (!gameRunning) return;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Draw basket
+  // Basket
   ctx.fillStyle = "blue";
   ctx.fillRect(basket.x, basket.y, basket.width, basket.height);
 
-  // Draw falling letters
+  // Letters
   drawLetters();
 
-  // Draw caught letters
+  // Score
   ctx.fillStyle = "black";
   ctx.font = "24px Arial";
   ctx.fillText("Caught: " + caughtLetters.join(" "), 10, 30);
 
-  // Check Win
+  // Win
   if (caughtLetters.length === word.length && caughtLetters.sort().join("") === word.sort().join("")) {
     endGame(true);
     return;
@@ -88,7 +86,6 @@ function gameLoop() {
   gameLoopId = requestAnimationFrame(gameLoop);
 }
 
-// ✨ Draw & update letters
 function drawLetters() {
   for (let i = 0; i < letters.length; i++) {
     const l = letters[i];
@@ -111,7 +108,7 @@ function drawLetters() {
       i--;
     }
 
-    // If missed
+    // Missed
     if (l.y > canvas.height) {
       letters.splice(i, 1);
       i--;
@@ -119,7 +116,6 @@ function drawLetters() {
   }
 }
 
-// 🏁 End Game
 function endGame(win) {
   gameRunning = false;
   clearInterval(letterInterval);
@@ -136,18 +132,20 @@ function endGame(win) {
   }
 }
 
-// 🎮 Move basket with keyboard
+// Keyboard
 document.addEventListener("keydown", (e) => {
   if (!gameRunning) return;
   if (e.key === "ArrowLeft" && basket.x > 0) basket.x -= 20;
   if (e.key === "ArrowRight" && basket.x + basket.width < canvas.width) basket.x += 20;
 });
 
-// 🎮 Move basket with on-screen buttons
+// On-screen buttons
 leftBtn.addEventListener("click", () => {
+  console.log("Left button pressed"); // debug
   if (basket.x > 0) basket.x -= 30;
 });
 
 rightBtn.addEventListener("click", () => {
+  console.log("Right button pressed"); // debug
   if (basket.x + basket.width < canvas.width) basket.x += 30;
 });
