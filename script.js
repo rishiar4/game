@@ -26,6 +26,19 @@ basketImg.src = "assets/cake.png";
 const balloonImg = new Image();
 balloonImg.src = "assets/balloons.jpg";
 
+// Track if images are ready
+let imagesLoaded = 0;
+basketImg.onload = checkImagesLoaded;
+balloonImg.onload = checkImagesLoaded;
+
+function checkImagesLoaded() {
+  imagesLoaded++;
+  if (imagesLoaded === 2) {
+    // Enable buttons once images are ready
+    enableGame();
+  }
+}
+
 // Reset game state
 function resetGame() {
   basket = {
@@ -42,13 +55,26 @@ function resetGame() {
 
 // Draw basket
 function drawBasket() {
-  ctx.drawImage(basketImg, basket.x, basket.y, basket.width, basket.height);
+  if (basketImg.complete) {
+    ctx.drawImage(basketImg, basket.x, basket.y, basket.width, basket.height);
+  } else {
+    ctx.fillStyle = "brown";
+    ctx.fillRect(basket.x, basket.y, basket.width, basket.height);
+  }
 }
 
 // Draw balloons
 function drawBalloons() {
   balloons.forEach(balloon => {
-    ctx.drawImage(balloonImg, balloon.x, balloon.y, balloon.size, balloon.size);
+    if (balloonImg.complete) {
+      ctx.drawImage(balloonImg, balloon.x, balloon.y, balloon.size, balloon.size);
+    } else {
+      // Fallback red circle while image loads
+      ctx.fillStyle = "red";
+      ctx.beginPath();
+      ctx.arc(balloon.x + balloon.size/2, balloon.y + balloon.size/2, balloon.size/2, 0, Math.PI * 2);
+      ctx.fill();
+    }
     balloon.y += balloon.speed;
   });
 }
@@ -110,36 +136,37 @@ function endGame() {
   video.play();
 }
 
-// Start button
-startBtn.addEventListener("click", () => {
-  startScreen.classList.add("hidden");
-  canvas.style.display = "block";
-  endScreen.classList.add("hidden");
+// Attach events after images load
+function enableGame() {
+  startBtn.addEventListener("click", () => {
+    startScreen.classList.add("hidden");
+    canvas.style.display = "block";
+    endScreen.classList.add("hidden");
 
-  resetGame();
-  bgMusic.play();
-  gameLoop();
+    resetGame();
+    bgMusic.play();
+    gameLoop();
 
-  // Spawn balloon immediately
-  spawnBalloon();
+    // Spawn balloon immediately
+    spawnBalloon();
 
-  // Then keep spawning
-  balloonInterval = setInterval(spawnBalloon, 1500);
-});
+    // Then keep spawning
+    balloonInterval = setInterval(spawnBalloon, 1500);
+  });
 
-// Restart button
-restartBtn.addEventListener("click", () => {
-  endScreen.classList.add("hidden");
-  canvas.style.display = "block";
-  startScreen.classList.add("hidden");
+  restartBtn.addEventListener("click", () => {
+    endScreen.classList.add("hidden");
+    canvas.style.display = "block";
+    startScreen.classList.add("hidden");
 
-  resetGame();
-  bgMusic.play();
-  gameLoop();
+    resetGame();
+    bgMusic.play();
+    gameLoop();
 
-  spawnBalloon();
-  balloonInterval = setInterval(spawnBalloon, 1500);
-});
+    spawnBalloon();
+    balloonInterval = setInterval(spawnBalloon, 1500);
+  });
+}
 
 // Move basket with device tilt
 window.addEventListener("deviceorientation", (e) => {
