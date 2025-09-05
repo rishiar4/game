@@ -7,7 +7,6 @@ const startScreen = document.getElementById("start-screen");
 const endScreen = document.getElementById("end-screen");
 const startBtn = document.getElementById("start-btn");
 const restartBtn = document.getElementById("restart-btn");
-const bgMusic = document.getElementById("bg-music");
 
 let basket, letters, score, gameOver, animationId, spawnInterval;
 
@@ -54,7 +53,7 @@ function checkCollision() {
       }
       return false; // remove caught letter
     }
-    return letter.y < canvas.height; // remove if it goes out of screen
+    return letter.y < canvas.height; // remove if off screen
   });
 }
 
@@ -83,21 +82,20 @@ function endGame() {
   cancelAnimationFrame(animationId);
   clearInterval(spawnInterval);
   endScreen.classList.remove("hidden");
-  bgMusic.pause();
 }
 
 startBtn.addEventListener("click", () => {
+  console.log("Game Started");
+  
   startScreen.classList.add("hidden");
   resetGame();
-  bgMusic.play();
   gameLoop();
-  spawnInterval = setInterval(spawnLetter, 1500); // keep letters falling
+  spawnInterval = setInterval(spawnLetter, 1500);
 });
 
 restartBtn.addEventListener("click", () => {
   endScreen.classList.add("hidden");
   resetGame();
-  bgMusic.play();
   gameLoop();
   spawnInterval = setInterval(spawnLetter, 1500);
 });

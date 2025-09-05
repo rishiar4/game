@@ -1,27 +1,23 @@
-/* General Reset */
 body, html {
   margin: 0;
   padding: 0;
   height: 100%;
-  font-family: Arial, sans-serif;
-  background: #fce4ec;
   overflow: hidden;
-  -webkit-text-size-adjust: 100%; /* prevent Safari zoom */
+  font-family: Arial, sans-serif;
+  text-align: center;
 }
 
-/* Screens */
 #start-screen, #end-screen {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: #ffe4f0;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
-  text-align: center;
+  align-items: center;
+  background: #ffe4e1;
 }
 
 .hidden {
@@ -30,12 +26,11 @@ body, html {
 
 canvas {
   display: block;
-  background: #cce7ff;
+  background: #f0f8ff;
 }
 
-/* Buttons */
 button {
-  font-size: 18px;  /* >=16px to stop mobile zoom */
+  font-size: 18px;
   padding: 12px 24px;
   border: none;
   border-radius: 8px;
@@ -44,7 +39,6 @@ button {
   font-weight: bold;
   cursor: pointer;
   transition: transform 0.2s ease;
-  margin-top: 20px;
 }
 
 button:active {
@@ -52,5 +46,6 @@ button:active {
 }
 
 html {
-  touch-action: manipulation; /* prevent double-tap zoom */
+  -webkit-text-size-adjust: 100%;
+  touch-action: manipulation;
 }
