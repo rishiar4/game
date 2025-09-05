@@ -1,15 +1,8 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
-// Resize canvas to full screen
-function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-resizeCanvas();
-window.addEventListener("resize", resizeCanvas);
-
-// UI elements
 const startScreen = document.getElementById("start-screen");
 const endScreen = document.getElementById("end-screen");
 const startBtn = document.getElementById("start-btn");
@@ -19,25 +12,11 @@ const video = document.getElementById("birthdayVideo");
 
 let basket, balloons, score, gameOver, animationId, balloonInterval;
 
-// Load images
 const basketImg = new Image();
 basketImg.src = "assets/cake.png";
 
 const balloonImg = new Image();
 balloonImg.src = "assets/balloons.jpg";
-
-// Track if images are ready
-let imagesLoaded = 0;
-basketImg.onload = checkImagesLoaded;
-balloonImg.onload = checkImagesLoaded;
-
-function checkImagesLoaded() {
-  imagesLoaded++;
-  if (imagesLoaded === 2) {
-    // Enable buttons once images are ready
-    enableGame();
-  }
-}
 
 // Reset game state
 function resetGame() {
@@ -45,31 +24,25 @@ function resetGame() {
     x: canvas.width / 2 - 40,
     y: canvas.height - 100,
     width: 80,
-    height: 80,
+    height: 80
   };
   balloons = [];
   score = 0;
   gameOver = false;
-  if (balloonInterval) clearInterval(balloonInterval);
 }
 
 // Draw basket
 function drawBasket() {
-  if (basketImg.complete) {
-    ctx.drawImage(basketImg, basket.x, basket.y, basket.width, basket.height);
-  } else {
-    ctx.fillStyle = "brown";
-    ctx.fillRect(basket.x, basket.y, basket.width, basket.height);
-  }
+  ctx.drawImage(basketImg, basket.x, basket.y, basket.width, basket.height);
 }
 
-// Draw balloons
+// Draw balloons + move them
 function drawBalloons() {
   balloons.forEach(balloon => {
     if (balloonImg.complete) {
       ctx.drawImage(balloonImg, balloon.x, balloon.y, balloon.size, balloon.size);
     } else {
-      // Fallback red circle while image loads
+      // fallback debug circle
       ctx.fillStyle = "red";
       ctx.beginPath();
       ctx.arc(balloon.x + balloon.size/2, balloon.y + balloon.size/2, balloon.size/2, 0, Math.PI * 2);
@@ -79,7 +52,7 @@ function drawBalloons() {
   });
 }
 
-// Check collisions
+// Check collision with basket
 function checkCollision() {
   balloons = balloons.filter(balloon => {
     if (
@@ -89,44 +62,44 @@ function checkCollision() {
     ) {
       score++;
       if (score >= 10) {
-        endGame(); // 🎉 Only ends when 10 caught
+        endGame();
       }
-      return false; // Balloon caught
+      return false; // caught → remove
     }
-    return balloon.y < canvas.height; // Remove if it falls past screen
+    return balloon.y < canvas.height; // keep only if still on screen
   });
 }
 
-// Game loop
+// Main game loop
 function gameLoop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawBasket();
   drawBalloons();
   checkCollision();
 
-  // Draw score
   ctx.fillStyle = "black";
   ctx.font = "24px Arial";
   ctx.fillText("Score: " + score, 20, 40);
 
-  if (!gameOver) animationId = requestAnimationFrame(gameLoop);
+  if (!gameOver) {
+    animationId = requestAnimationFrame(gameLoop);
+  }
 }
 
 // Spawn a balloon
 function spawnBalloon() {
   const size = 50;
   const x = Math.random() * (canvas.width - size);
-  balloons.push({ x, y: -size, size, speed: 3 + Math.random() * 2 });
+  balloons.push({ x, y: -size, size, speed: 2 + Math.random() * 3 });
 }
 
-// End game
+// End the game
 function endGame() {
   gameOver = true;
   cancelAnimationFrame(animationId);
   clearInterval(balloonInterval);
   bgMusic.pause();
 
-  // Hide canvas, show end screen
   canvas.style.display = "none";
   endScreen.classList.remove("hidden");
 
@@ -136,44 +109,39 @@ function endGame() {
   video.play();
 }
 
-// Attach events after images load
-function enableGame() {
-  startBtn.addEventListener("click", () => {
-    startScreen.classList.add("hidden");
-    canvas.style.display = "block";
-    endScreen.classList.add("hidden");
+// Start button
+startBtn.addEventListener("click", () => {
+  startScreen.classList.add("hidden");
+  canvas.style.display = "block";
+  endScreen.classList.add("hidden");
 
-    resetGame();
-    bgMusic.play();
-    gameLoop();
+  resetGame();
+  bgMusic.play();
+  gameLoop();
 
-    // Spawn balloon immediately
-    spawnBalloon();
+  spawnBalloon(); // spawn first immediately
+  balloonInterval = setInterval(spawnBalloon, 1500);
+});
 
-    // Then keep spawning
-    balloonInterval = setInterval(spawnBalloon, 1500);
-  });
+// Restart button
+restartBtn.addEventListener("click", () => {
+  endScreen.classList.add("hidden");
+  canvas.style.display = "block";
+  startScreen.classList.add("hidden");
 
-  restartBtn.addEventListener("click", () => {
-    endScreen.classList.add("hidden");
-    canvas.style.display = "block";
-    startScreen.classList.add("hidden");
+  resetGame();
+  bgMusic.play();
+  gameLoop();
 
-    resetGame();
-    bgMusic.play();
-    gameLoop();
+  spawnBalloon();
+  balloonInterval = setInterval(spawnBalloon, 1500);
+});
 
-    spawnBalloon();
-    balloonInterval = setInterval(spawnBalloon, 1500);
-  });
-}
-
-// Move basket with device tilt
+// Tilt control (mobile)
 window.addEventListener("deviceorientation", (e) => {
   if (e.gamma) {
     basket.x += e.gamma;
     if (basket.x < 0) basket.x = 0;
-    if (basket.x + basket.width > canvas.width)
-      basket.x = canvas.width - basket.width;
+    if (basket.x + basket.width > canvas.width) basket.x = canvas.width - basket.width;
   }
 });
