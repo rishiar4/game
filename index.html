@@ -3,17 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <title>Happy Birthday 🎂</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- Start Screen -->
   <div id="start-screen">
     <h1>🎉 Happy Birthday Game 🎉</h1>
     <button id="start-btn">Tap to Start</button>
   </div>
 
-  <canvas id="gameCanvas"></canvas>
+  <!-- Game Screen -->
+  <div id="game-screen" class="hidden">
+    <div id="catcher"></div>
+  </div>
 
+  <!-- End Screen -->
   <div id="end-screen" class="hidden">
     <h1>🎂 Happy Birthday Shreya 💕 🎂</h1>
     <button id="restart-btn">Play Again</button>

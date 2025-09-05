@@ -1,51 +1,46 @@
-body, html {
+body {
   margin: 0;
   padding: 0;
-  height: 100%;
-  overflow: hidden;
   font-family: Arial, sans-serif;
   text-align: center;
-}
-
-#start-screen, #end-screen {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background: #ffe4e1;
+  background: #ffe6f2;
+  overflow: hidden;
 }
 
 .hidden {
   display: none;
 }
 
-canvas {
-  display: block;
-  background: #f0f8ff;
+#start-screen,
+#end-screen {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
-button {
-  font-size: 18px;
-  padding: 12px 24px;
-  border: none;
-  border-radius: 8px;
-  background: #ff69b4;
-  color: white;
+#game-screen {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  background: #fce4ec;
+  overflow: hidden;
+}
+
+#catcher {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  width: 120px;
+  height: 20px;
+  background: blue;
+  border-radius: 5px;
+  transform: translateX(-50%);
+}
+
+.letter {
+  position: absolute;
+  font-size: 32px;
   font-weight: bold;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-button:active {
-  transform: scale(0.95);
-}
-
-html {
-  -webkit-text-size-adjust: 100%;
-  touch-action: manipulation;
+  color: red;
 }

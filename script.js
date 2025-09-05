@@ -1,117 +1,106 @@
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+window.addEventListener("DOMContentLoaded", () => {
+  const startScreen = document.getElementById("start-screen");
+  const gameScreen = document.getElementById("game-screen");
+  const endScreen = document.getElementById("end-screen");
+  const startBtn = document.getElementById("start-btn");
+  const restartBtn = document.getElementById("restart-btn");
+  const catcher = document.getElementById("catcher");
 
-const startScreen = document.getElementById("start-screen");
-const endScreen = document.getElementById("end-screen");
-const startBtn = document.getElementById("start-btn");
-const restartBtn = document.getElementById("restart-btn");
+  let catcherX = window.innerWidth / 2 - 60;
+  let letters = [];
+  let score = 0;
+  let spawnInterval;
+  const targetWord = "SHREYA".split("");
 
-let basket, letters, score, gameOver, animationId, spawnInterval;
-
-// Word to collect
-const targetWord = "SHREYA".split("");
-
-function resetGame() {
-  basket = {
-    x: canvas.width / 2 - 50,
-    y: canvas.height - 60,
-    width: 100,
-    height: 20,
-  };
-  letters = [];
-  score = 0;
-  gameOver = false;
-  if (spawnInterval) clearInterval(spawnInterval);
-}
-
-function drawBasket() {
-  ctx.fillStyle = "blue";
-  ctx.fillRect(basket.x, basket.y, basket.width, basket.height);
-}
-
-function drawLetters() {
-  ctx.fillStyle = "red";
-  ctx.font = "40px Arial";
-  letters.forEach((letter) => {
-    ctx.fillText(letter.char, letter.x, letter.y);
-    letter.y += letter.speed;
-  });
-}
-
-function checkCollision() {
-  letters = letters.filter((letter) => {
-    if (
-      letter.y + 40 > basket.y &&
-      letter.x > basket.x &&
-      letter.x < basket.x + basket.width
-    ) {
-      score++;
-      if (score >= targetWord.length) {
-        endGame();
-      }
-      return false; // remove caught letter
-    }
-    return letter.y < canvas.height; // remove if off screen
-  });
-}
-
-function gameLoop() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawBasket();
-  drawLetters();
-  checkCollision();
-
-  // Score counter
-  ctx.fillStyle = "black";
-  ctx.font = "24px Arial";
-  ctx.fillText("Caught: " + score + "/" + targetWord.length, 20, 40);
-
-  if (!gameOver) animationId = requestAnimationFrame(gameLoop);
-}
-
-function spawnLetter() {
-  const char = targetWord[Math.floor(Math.random() * targetWord.length)];
-  const x = Math.random() * (canvas.width - 40);
-  letters.push({ char, x, y: -40, speed: 2 + Math.random() * 2 });
-}
-
-function endGame() {
-  gameOver = true;
-  cancelAnimationFrame(animationId);
-  clearInterval(spawnInterval);
-  endScreen.classList.remove("hidden");
-}
-
-startBtn.addEventListener("click", () => {
-  console.log("Game Started");
-  
-  startScreen.classList.add("hidden");
-  resetGame();
-  gameLoop();
-  spawnInterval = setInterval(spawnLetter, 1500);
-});
-
-restartBtn.addEventListener("click", () => {
-  endScreen.classList.add("hidden");
-  resetGame();
-  gameLoop();
-  spawnInterval = setInterval(spawnLetter, 1500);
-});
-
-// Basket controls: phone tilt
-window.addEventListener("deviceorientation", (e) => {
-  if (e.gamma) {
-    basket.x += e.gamma;
-    if (basket.x < 0) basket.x = 0;
-    if (basket.x + basket.width > canvas.width)
-      basket.x = canvas.width - basket.width;
+  // Reset game
+  function resetGame() {
+    letters.forEach(l => l.el.remove());
+    letters = [];
+    score = 0;
+    catcherX = window.innerWidth / 2 - 60;
+    catcher.style.left = catcherX + "px";
   }
-});
 
-// Basket controls: keyboard (for PC testing)
-window.addEventListener("keydown", (e) => {
-  if (e.key === "ArrowLeft") basket.x -= 20;
-  if (e.key === "ArrowRight") basket.x += 20;
+  // Spawn falling letter
+  function spawnLetter() {
+    const letter = targetWord[Math.floor(Math.random() * targetWord.length)];
+    const el = document.createElement("div");
+    el.classList.add("letter");
+    el.textContent = letter;
+    const x = Math.random() * (window.innerWidth - 30);
+    el.style.left = x + "px";
+    el.style.top = "0px";
+    gameScreen.appendChild(el);
+
+    letters.push({ el, x, y: 0, speed: 2 + Math.random() * 3, char: letter });
+  }
+
+  // Game loop
+  function gameLoop() {
+    letters.forEach((l, i) => {
+      l.y += l.speed;
+      l.el.style.top = l.y + "px";
+
+      // Collision with catcher
+      if (
+        l.y + 30 >= window.innerHeight - 60 &&
+        l.x + 20 > catcherX &&
+        l.x < catcherX + 120
+      ) {
+        l.el.remove();
+        letters.splice(i, 1);
+        score++;
+        if (score >= targetWord.length) {
+          endGame();
+        }
+      }
+
+      // Remove if falls below screen
+      if (l.y > window.innerHeight) {
+        l.el.remove();
+        letters.splice(i, 1);
+      }
+    });
+
+    if (score < targetWord.length) {
+      requestAnimationFrame(gameLoop);
+    }
+  }
+
+  // End game
+  function endGame() {
+    clearInterval(spawnInterval);
+    gameScreen.classList.add("hidden");
+    endScreen.classList.remove("hidden");
+  }
+
+  // Controls
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowLeft") {
+      catcherX -= 20;
+    } else if (e.key === "ArrowRight") {
+      catcherX += 20;
+    }
+    if (catcherX < 0) catcherX = 0;
+    if (catcherX > window.innerWidth - 120) catcherX = window.innerWidth - 120;
+    catcher.style.left = catcherX + "px";
+  });
+
+  // Start button
+  startBtn.addEventListener("click", () => {
+    startScreen.classList.add("hidden");
+    gameScreen.classList.remove("hidden");
+    resetGame();
+    spawnInterval = setInterval(spawnLetter, 1500);
+    gameLoop();
+  });
+
+  // Restart button
+  restartBtn.addEventListener("click", () => {
+    endScreen.classList.add("hidden");
+    gameScreen.classList.remove("hidden");
+    resetGame();
+    spawnInterval = setInterval(spawnLetter, 1500);
+    gameLoop();
+  });
 });
