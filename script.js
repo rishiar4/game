@@ -1,7 +1,12 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
 
 const startScreen = document.getElementById("start-screen");
 const endScreen = document.getElementById("end-screen");
@@ -10,7 +15,7 @@ const restartBtn = document.getElementById("restart-btn");
 const bgMusic = document.getElementById("bg-music");
 const video = document.getElementById("birthdayVideo");
 
-let basket, balloons, score, gameOver, animationId;
+let basket, balloons, score, gameOver, animationId, balloonInterval;
 
 const basketImg = new Image();
 basketImg.src = "assets/cake.png";
@@ -23,6 +28,7 @@ function resetGame() {
   balloons = [];
   score = 0;
   gameOver = false;
+  if (balloonInterval) clearInterval(balloonInterval);
 }
 
 function drawBasket() {
@@ -38,9 +44,11 @@ function drawBalloons() {
 
 function checkCollision() {
   balloons = balloons.filter(balloon => {
-    if (balloon.y + balloon.size > basket.y &&
-        balloon.x < basket.x + basket.width &&
-        balloon.x + balloon.size > basket.x) {
+    if (
+      balloon.y + balloon.size > basket.y &&
+      balloon.x < basket.x + basket.width &&
+      balloon.x + balloon.size > basket.x
+    ) {
       score++;
       if (score >= 10) {
         endGame();
@@ -72,6 +80,7 @@ function spawnBalloon() {
 function endGame() {
   gameOver = true;
   cancelAnimationFrame(animationId);
+  clearInterval(balloonInterval);
   endScreen.classList.remove("hidden");
   bgMusic.pause();
   video.play();
@@ -82,7 +91,7 @@ startBtn.addEventListener("click", () => {
   resetGame();
   bgMusic.play();
   gameLoop();
-  setInterval(spawnBalloon, 1500);
+  balloonInterval = setInterval(spawnBalloon, 1500);
 });
 
 restartBtn.addEventListener("click", () => {
@@ -90,6 +99,7 @@ restartBtn.addEventListener("click", () => {
   resetGame();
   bgMusic.play();
   gameLoop();
+  balloonInterval = setInterval(spawnBalloon, 1500);
 });
 
 window.addEventListener("deviceorientation", (e) => {
