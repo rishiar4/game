@@ -74,7 +74,7 @@ window.addEventListener("DOMContentLoaded", () => {
     endScreen.classList.remove("hidden");
   }
 
-  // Controls
+  // Desktop controls
   window.addEventListener("keydown", (e) => {
     if (e.key === "ArrowLeft") {
       catcherX -= 20;
@@ -84,6 +84,28 @@ window.addEventListener("DOMContentLoaded", () => {
     if (catcherX < 0) catcherX = 0;
     if (catcherX > window.innerWidth - 120) catcherX = window.innerWidth - 120;
     catcher.style.left = catcherX + "px";
+  });
+
+  // Mobile touch controls
+  let touchStartX = null;
+  window.addEventListener("touchstart", (e) => {
+    touchStartX = e.touches[0].clientX;
+  });
+
+  window.addEventListener("touchmove", (e) => {
+    if (touchStartX !== null) {
+      let touchX = e.touches[0].clientX;
+      let deltaX = touchX - touchStartX;
+      catcherX += deltaX;
+      if (catcherX < 0) catcherX = 0;
+      if (catcherX > window.innerWidth - 120) catcherX = window.innerWidth - 120;
+      catcher.style.left = catcherX + "px";
+      touchStartX = touchX; // update so movement is smooth
+    }
+  });
+
+  window.addEventListener("touchend", () => {
+    touchStartX = null;
   });
 
   // Start button
