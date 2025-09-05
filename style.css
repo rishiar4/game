@@ -2,52 +2,52 @@ body {
   margin: 0;
   padding: 0;
   font-family: Arial, sans-serif;
-  background: #fdf6f9;
+  background: linear-gradient(to bottom, #ffdde1, #ee9ca7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+}
+
+canvas {
+  display: none;
+  border: 2px solid #333;
+  background: #fff;
+  border-radius: 10px;
+}
+
+.screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.9);
   text-align: center;
 }
 
-/* Hide canvas + end screen initially */
-#gameCanvas,
-#end-screen {
-  display: none;
-}
-
-#start-screen,
-#end-screen {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-#start-screen h1,
-#end-screen h1 {
-  margin-bottom: 20px;
-}
-
 button {
+  margin-top: 20px;
   padding: 12px 24px;
   font-size: 18px;
-  cursor: pointer;
   border: none;
+  background: #ff4081;
+  color: #fff;
   border-radius: 8px;
-  background: #ff69b4;
-  color: white;
+  cursor: pointer;
   transition: background 0.3s;
 }
 
 button:hover {
-  background: #e0559e;
+  background: #e91e63;
 }
 
-.hidden {
-  display: none !important;
-}
-
-#gameCanvas {
-  display: block;
-  width: 100%;
-  height: 100%;
-  background: #e0f7ff;
+#winScreen h1 {
+  font-size: 36px;
+  color: #4caf50;
 }

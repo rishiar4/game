@@ -14,13 +14,14 @@ let gameRunning = false;
 let gameLoopId;
 let letterInterval;
 
-const word = "SHREYA".split(""); // The target word
+const word = "SHREYA".split(""); // target letters
 
 // 🎮 Start Game
 startBtn.addEventListener("click", () => {
   startScreen.style.display = "none";
   winScreen.style.display = "none";
   gameOverScreen.style.display = "none";
+  canvas.style.display = "block";
   resetGame();
   startGame();
 });
@@ -46,7 +47,7 @@ function startGame() {
   gameLoop();
 }
 
-// 🎲 Spawn a random letter from SHREYA
+// 🎲 Spawn a random letter
 function spawnLetter() {
   const size = 40;
   const x = Math.random() * (canvas.width - size);
@@ -54,7 +55,7 @@ function spawnLetter() {
   letters.push({ x, y: -size, size, speed: 2 + Math.random() * 3, char: letter });
 }
 
-// 🎮 Main Game Loop
+// 🎮 Game Loop
 function gameLoop() {
   if (!gameRunning) return;
 
@@ -67,7 +68,7 @@ function gameLoop() {
   // Draw falling letters
   drawLetters();
 
-  // Draw caught letters progress
+  // Draw caught letters
   ctx.fillStyle = "black";
   ctx.font = "24px Arial";
   ctx.fillText("Caught: " + caughtLetters.join(" "), 10, 30);
@@ -81,7 +82,7 @@ function gameLoop() {
   gameLoopId = requestAnimationFrame(gameLoop);
 }
 
-// ✨ Draw and update letters
+// ✨ Draw & update letters
 function drawLetters() {
   for (let i = 0; i < letters.length; i++) {
     const l = letters[i];
@@ -91,7 +92,7 @@ function drawLetters() {
     ctx.font = `${l.size}px Arial`;
     ctx.fillText(l.char, l.x, l.y);
 
-    // Collision detection
+    // Collision
     if (
       l.y + l.size > basket.y &&
       l.x > basket.x &&
@@ -117,6 +118,8 @@ function endGame(win) {
   gameRunning = false;
   clearInterval(letterInterval);
   cancelAnimationFrame(gameLoopId);
+
+  canvas.style.display = "none";
 
   if (win) {
     winScreen.style.display = "flex";
